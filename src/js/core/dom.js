@@ -25,6 +25,7 @@ define(['summernote/core/func', 'summernote/core/list', 'summernote/core/agent']
      */
     var buildLayoutInfo = function ($editor) {
       var makeFinder;
+      var changefunc;
 
       // air mode
       if ($editor.hasClass('note-air-editor')) {
@@ -33,9 +34,17 @@ define(['summernote/core/func', 'summernote/core/list', 'summernote/core/agent']
           return function () { return $(sIdPrefix + id); };
         };
 
+        changefunc = function () {
+          var options = $editor.data('options');
+          if (options && options.onChange) {
+            options.onChange($editor, $editor.html());
+          }
+        };
+
         return {
           editor: function () { return $editor; },
           editable: function () { return $editor; },
+          dropzone: function () { return $editor; },
           popover: makeFinder('#note-popover-'),
           handle: makeFinder('#note-handle-'),
           dialog: makeFinder('#note-dialog-')
@@ -47,6 +56,7 @@ define(['summernote/core/func', 'summernote/core/list', 'summernote/core/agent']
           return function () { return $editor.find(sClassName); };
         };
         return {
+
           editor: function () { return $editor; },
           dropzone: makeFinder('.note-dropzone'),
           toolbar: makeFinder('.note-toolbar'),

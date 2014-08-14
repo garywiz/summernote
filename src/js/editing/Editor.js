@@ -138,9 +138,20 @@ define([
     this.insertImage = function ($editable, sUrl, filename) {
       async.createImage(sUrl, filename).then(function ($image) {
         recordUndo($editable);
+        var maxwidth = $editable.width() * 0.80;
+        var maxheight = Math.min(600, $editable.height() * 2);
+        var w = $image.width();
+        var h = $image.height();
+        if (maxwidth < w) {
+          h = h * maxwidth / w;
+          w = maxwidth;
+        }
+        if (maxheight < h) {
+          w = w * maxheight / h;
+        }
         $image.css({
           display: '',
-          width: Math.min($editable.width(), $image.width())
+          width: w
         });
         range.create().insertNode($image[0]);
       }).fail(function () {
@@ -387,6 +398,7 @@ define([
     this.floatMe = function ($editable, sValue, $target) {
       recordUndo($editable);
       $target.css('float', sValue);
+      $editable.data('options').signalChange($editable);
     };
 
     /**
@@ -402,6 +414,7 @@ define([
         width: $editable.width() * sValue + 'px',
         height: ''
       });
+      $editable.data('options').signalChange($editable);
     };
 
     /**
@@ -438,6 +451,7 @@ define([
     this.removeMedia = function ($editable, sValue, $target) {
       recordUndo($editable);
       $target.detach();
+      $editable.data('options').signalChange($editable);
     };
   };
 

@@ -56,9 +56,11 @@ define([
      * @param {jQuery} $editable
      * @param {File[]} files
      */
-    var insertImages = function ($editable, files) {
-      editor.restoreRange($editable);
+    var insertImages = function (oLayoutInfo, files) {
+      var $editable = oLayoutInfo.editable();
       var callbacks = $editable.data('callbacks');
+
+      editor.restoreRange($editable);
 
       // If onImageUpload options setted
       if (callbacks.onImageUpload) {
@@ -75,6 +77,7 @@ define([
             }
           });
         });
+        $editable.data('options').signalChange($editable);
       }
     };
 
@@ -96,6 +99,7 @@ define([
           editor.createLink($editable, linkInfo, options);
           // hide popover after creating link
           popover.hide(oLayoutInfo.popover());
+          options.signalChange($editable);
         }).fail(function () {
           editor.restoreRange($editable);
         });
@@ -115,9 +119,10 @@ define([
           if (typeof data === 'string') {
             // image url
             editor.insertImage($editable, data);
+            $editable.data('options').signalChange($editable);
           } else {
             // array of files
-            insertImages($editable, data);
+            insertImages(oLayoutInfo, data);
           }
         }).fail(function () {
           editor.restoreRange($editable);
@@ -307,7 +312,7 @@ define([
       var isClipboardImage = item.kind === 'file' && item.type.indexOf('image/') !== -1;
 
       if (isClipboardImage) {
-        insertImages(oLayoutInfo.editable(), [item.getAsFile()]);
+        insertImages(oLayoutInfo, [item.getAsFile()]);
       }
     };
 
@@ -338,6 +343,8 @@ define([
             x: event.clientX - posStart.left,
             y: event.clientY - (posStart.top - scrollTop)
           }, $target, !event.shiftKey);
+
+          $editable.data('options').signalChange($editable);
 
           handle.update($handle, {image: elTarget}, isAirMode);
           popover.update($popover, {image: elTarget}, isAirMode);
@@ -482,8 +489,10 @@ define([
         var isCodeview = oLayoutInfo.editor.hasClass('codeview');
         if (!isCodeview && !collection.length) {
           oLayoutInfo.editor.addClass('dragover');
-          $dropzone.width(oLayoutInfo.editor.width());
-          $dropzone.height(oLayoutInfo.editor.height());
+          if ($dropzone !== oLayoutInfo.editor) {
+            $dropzone.width(oLayoutInfo.editor.width());
+            $dropzone.height(oLayoutInfo.editor.height());
+          }
           $dropzoneMessage.text('Drag Image Here');
         }
         collection = collection.add(e.target);
@@ -514,7 +523,7 @@ define([
         if (dataTransfer && dataTransfer.files) {
           var oLayoutInfo = makeLayoutInfo(event.currentTarget || event.target);
           oLayoutInfo.editable().focus();
-          insertImages(oLayoutInfo.editable(), dataTransfer.files);
+          insertImages(oLayoutInfo, dataTransfer.files);
         }
       }).on('dragover', false); // prevent default dragover event
     };
@@ -594,6 +603,8 @@ define([
         if (!options.disableResizeEditor) {
           oLayoutInfo.statusbar.on('mousedown', hStatusbarMousedown);
         }
+      } else if (options.airModeDragDrop) {
+        attachDragAndDropEvent(oLayoutInfo);
       }
 
       // handler for table dimension
@@ -637,6 +648,13 @@ define([
 
       // callbacks for advanced features (camel)
       if (options.onToolbarClick) { oLayoutInfo.toolbar.click(options.onToolbarClick); }
+
+      options.signalChange = function (e) {
+          if (options.onChange) {
+            options.onChange(e, e.html());
+          }
+        };
+
       if (options.onChange) {
         var hChange = function () {
           options.onChange(oLayoutInfo.editable, oLayoutInfo.editable.html());
