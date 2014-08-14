@@ -113,6 +113,7 @@ define([
             $editable = oLayoutInfo.editable();
 
         editor.saveRange($editable);
+        popover.hide(oLayoutInfo.popover());
         dialog.showImageDialog($editable, $dialog).then(function (data) {
           editor.restoreRange($editable);
 
@@ -154,6 +155,7 @@ define([
             $editable = oLayoutInfo.editable();
 
         editor.saveRange($editable);
+        popover.hide(oLayoutInfo.popover());
         dialog.showHelpDialog($editable, $dialog).then(function () {
           editor.restoreRange($editable);
         });

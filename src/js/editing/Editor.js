@@ -148,10 +148,12 @@ define([
         }
         if (maxheight < h) {
           w = w * maxheight / h;
+          h = maxheight;
         }
         $image.css({
           display: '',
-          width: w
+          width: Math.round(w),
+          height: Math.round(h)
         });
         range.create().insertNode($image[0]);
       }).fail(function () {

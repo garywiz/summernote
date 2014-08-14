@@ -1,8 +1,9 @@
 define([
   'summernote/core/agent', 'summernote/core/dom',
   'summernote/settings',
+  'summernote/core/range',
   'summernote/EventHandler', 'summernote/Renderer'
-], function (agent, dom, settings, EventHandler, Renderer) {
+], function (agent, dom, settings, range, EventHandler, Renderer) {
   // jQuery namespace for summernote
   $.summernote = $.summernote || {};
 
@@ -45,8 +46,12 @@ define([
       });
 
       // focus on first editable element
-      if (this.first().length && options.focus) {
+      if (this.first().length && (options.focus || options.initialFocus)) {
         var info = renderer.layoutInfoFromHolder(this.first());
+        if (options.initialFocus && options.initialFocus.first()) {
+          var rng = range.createFromNode(options.initialFocus.first().get(0));
+          rng.collapse().select();
+        }
         info.editable.focus();
       }
 
