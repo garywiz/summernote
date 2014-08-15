@@ -68,7 +68,6 @@ define([
       }
 
       var $airPopover = $popover.find('.note-air-popover');
-      console.log(oStyle.range);
       if (isAirMode && !oStyle.range.isCollapsed()) {
         var bnd = func.rect2bnd(list.last(oStyle.range.getClientRects()));
         showPopover($airPopover, {

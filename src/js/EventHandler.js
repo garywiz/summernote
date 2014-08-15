@@ -113,7 +113,6 @@ define([
             $editable = oLayoutInfo.editable();
 
         editor.saveRange($editable);
-        popover.hide(oLayoutInfo.popover());
         dialog.showImageDialog($editable, $dialog).then(function (data) {
           editor.restoreRange($editable);
 
