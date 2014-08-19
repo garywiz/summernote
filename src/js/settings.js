@@ -126,7 +126,7 @@ define('summernote/settings', function () {
       onCreateLink: function (sLinkUrl) {
         if (sLinkUrl.indexOf('@') !== -1 && sLinkUrl.indexOf(':') === -1) {
           sLinkUrl =  'mailto:' + sLinkUrl;
-        } else if (sLinkUrl.indexOf('://') === -1) {
+        } else if (sLinkUrl.indexOf('://') === -1 && sLinkUrl.indexOf('mailto:') === -1) {
           sLinkUrl = 'http://' + sLinkUrl;
         }
 

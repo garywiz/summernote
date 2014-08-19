@@ -6,7 +6,7 @@
  * Copyright 2013 Alan Hong. and outher contributors
  * summernote may be freely distributed under the MIT license./
  *
- * Date: 2014-08-15T05:26Z
+ * Date: 2014-08-18T06:50Z
  */
 (function (factory) {
   /* global define */
@@ -909,7 +909,7 @@
       onCreateLink: function (sLinkUrl) {
         if (sLinkUrl.indexOf('@') !== -1 && sLinkUrl.indexOf(':') === -1) {
           sLinkUrl =  'mailto:' + sLinkUrl;
-        } else if (sLinkUrl.indexOf('://') === -1) {
+        } else if (sLinkUrl.indexOf('://') === -1 && sLinkUrl.indexOf('mailto:') === -1) {
           sLinkUrl = 'http://' + sLinkUrl;
         }
 
@@ -2438,7 +2438,6 @@
       }
 
       var $airPopover = $popover.find('.note-air-popover');
-      console.log(oStyle.range);
       if (isAirMode && !oStyle.range.isCollapsed()) {
         var bnd = func.rect2bnd(list.last(oStyle.range.getClientRects()));
         showPopover($airPopover, {
@@ -2802,7 +2801,6 @@
             $editable = oLayoutInfo.editable();
 
         editor.saveRange($editable);
-        popover.hide(oLayoutInfo.popover());
         dialog.showImageDialog($editable, $dialog).then(function (data) {
           editor.restoreRange($editable);
 
