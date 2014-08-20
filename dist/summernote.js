@@ -6,7 +6,7 @@
  * Copyright 2013 Alan Hong. and outher contributors
  * summernote may be freely distributed under the MIT license./
  *
- * Date: 2014-08-19T18:31Z
+ * Date: 2014-08-20T05:16Z
  */
 (function (factory) {
   /* global define */
@@ -2120,9 +2120,13 @@
      * @param {jQuery} $target
      */
     this.floatMe = function ($editable, sValue, $target) {
+      var callbacks = $editable.data('callbacks');
       recordUndo($editable);
       $target.css('float', sValue);
-      $editable.data('options').signalChange($editable);
+      if (callbacks.onImageChange) {
+        callbacks.onImageChange($editable, $target);
+      }
+      callbacks.signalChange($editable);
     };
 
     /**
@@ -2132,13 +2136,17 @@
      * @param {jQuery} $target - target element
      */
     this.resize = function ($editable, sValue, $target) {
+      var callbacks = $editable.data('callbacks');
       recordUndo($editable);
 
       $target.css({
         width: $editable.width() * sValue + 'px',
         height: ''
       });
-      $editable.data('options').signalChange($editable);
+      if (callbacks.onImageChange) {
+        callbacks.onImageChange($editable, $target);
+      }
+      callbacks.signalChange($editable);
     };
 
     /**
@@ -2175,7 +2183,7 @@
     this.removeMedia = function ($editable, sValue, $target) {
       recordUndo($editable);
       $target.detach();
-      $editable.data('options').signalChange($editable);
+      $editable.data('callbacks').signalChange($editable);
     };
   };
 
@@ -2480,8 +2488,8 @@
 
         // include margin
         var szImage = {
-          w: $image.outerWidth(true),
-          h: $image.outerHeight(true)
+          w: $image.outerWidth(false),
+          h: $image.outerHeight(false)
         };
 
         $selection.css({
@@ -2765,7 +2773,7 @@
             }
           });
         });
-        $editable.data('options').signalChange($editable);
+        callbacks.signalChange($editable);
       }
     };
 
@@ -2787,7 +2795,7 @@
           editor.createLink($editable, linkInfo, options);
           // hide popover after creating link
           popover.hide(oLayoutInfo.popover());
-          options.signalChange($editable);
+          $editable.data('callbacks').signalChange($editable);
         }).fail(function () {
           editor.restoreRange($editable);
         });
@@ -2807,7 +2815,7 @@
           if (typeof data === 'string') {
             // image url
             editor.insertImage($editable, data);
-            $editable.data('options').signalChange($editable);
+            $editable.data('callbacks').signalChange($editable);
           } else {
             // array of files
             insertImages(oLayoutInfo, data);
@@ -3032,7 +3040,7 @@
             y: event.clientY - (posStart.top - scrollTop)
           }, $target, !event.shiftKey);
 
-          $editable.data('options').signalChange($editable);
+          $editable.data('callbacks').signalChange($editable);
 
           handle.update($handle, {image: elTarget}, isAirMode);
           popover.update($popover, {image: elTarget}, isAirMode);
@@ -3344,12 +3352,6 @@
       // callbacks for advanced features (camel)
       if (options.onToolbarClick) { oLayoutInfo.toolbar.click(options.onToolbarClick); }
 
-      options.signalChange = function (e) {
-          if (options.onChange) {
-            options.onChange(e, e.html());
-          }
-        };
-
       if (options.onChange) {
         var hChange = function () {
           options.onChange(oLayoutInfo.editable, oLayoutInfo.editable.html());
@@ -3370,7 +3372,13 @@
         onImageUpload: options.onImageUpload,
         onImageUploadError: options.onImageUploadError,
         onFileUpload: options.onFileUpload,
-        onFileUploadError: options.onFileUpload
+        onFileUploadError: options.onFileUpload,
+        onImageChange: options.onImageChange,
+        signalChange: function ($e) {
+          if (options.onChange) {
+            options.onChange($e, $e.html());
+          }
+        }
       });
     };
 

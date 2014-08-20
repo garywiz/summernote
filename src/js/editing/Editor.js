@@ -401,9 +401,13 @@ define([
      * @param {jQuery} $target
      */
     this.floatMe = function ($editable, sValue, $target) {
+      var callbacks = $editable.data('callbacks');
       recordUndo($editable);
       $target.css('float', sValue);
-      $editable.data('options').signalChange($editable);
+      if (callbacks.onImageChange) {
+        callbacks.onImageChange($editable, $target);
+      }
+      callbacks.signalChange($editable);
     };
 
     /**
@@ -413,13 +417,17 @@ define([
      * @param {jQuery} $target - target element
      */
     this.resize = function ($editable, sValue, $target) {
+      var callbacks = $editable.data('callbacks');
       recordUndo($editable);
 
       $target.css({
         width: $editable.width() * sValue + 'px',
         height: ''
       });
-      $editable.data('options').signalChange($editable);
+      if (callbacks.onImageChange) {
+        callbacks.onImageChange($editable, $target);
+      }
+      callbacks.signalChange($editable);
     };
 
     /**
@@ -456,7 +464,7 @@ define([
     this.removeMedia = function ($editable, sValue, $target) {
       recordUndo($editable);
       $target.detach();
-      $editable.data('options').signalChange($editable);
+      $editable.data('callbacks').signalChange($editable);
     };
   };
 

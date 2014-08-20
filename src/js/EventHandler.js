@@ -77,7 +77,7 @@ define([
             }
           });
         });
-        $editable.data('options').signalChange($editable);
+        callbacks.signalChange($editable);
       }
     };
 
@@ -99,7 +99,7 @@ define([
           editor.createLink($editable, linkInfo, options);
           // hide popover after creating link
           popover.hide(oLayoutInfo.popover());
-          options.signalChange($editable);
+          $editable.data('callbacks').signalChange($editable);
         }).fail(function () {
           editor.restoreRange($editable);
         });
@@ -119,7 +119,7 @@ define([
           if (typeof data === 'string') {
             // image url
             editor.insertImage($editable, data);
-            $editable.data('options').signalChange($editable);
+            $editable.data('callbacks').signalChange($editable);
           } else {
             // array of files
             insertImages(oLayoutInfo, data);
@@ -344,7 +344,7 @@ define([
             y: event.clientY - (posStart.top - scrollTop)
           }, $target, !event.shiftKey);
 
-          $editable.data('options').signalChange($editable);
+          $editable.data('callbacks').signalChange($editable);
 
           handle.update($handle, {image: elTarget}, isAirMode);
           popover.update($popover, {image: elTarget}, isAirMode);
@@ -656,12 +656,6 @@ define([
       // callbacks for advanced features (camel)
       if (options.onToolbarClick) { oLayoutInfo.toolbar.click(options.onToolbarClick); }
 
-      options.signalChange = function (e) {
-          if (options.onChange) {
-            options.onChange(e, e.html());
-          }
-        };
-
       if (options.onChange) {
         var hChange = function () {
           options.onChange(oLayoutInfo.editable, oLayoutInfo.editable.html());
@@ -682,7 +676,13 @@ define([
         onImageUpload: options.onImageUpload,
         onImageUploadError: options.onImageUploadError,
         onFileUpload: options.onFileUpload,
-        onFileUploadError: options.onFileUpload
+        onFileUploadError: options.onFileUpload,
+        onImageChange: options.onImageChange,
+        signalChange: function ($e) {
+          if (options.onChange) {
+            options.onChange($e, $e.html());
+          }
+        }
       });
     };
 

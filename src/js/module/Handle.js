@@ -17,8 +17,8 @@ define('summernote/module/Handle', function () {
 
         // include margin
         var szImage = {
-          w: $image.outerWidth(true),
-          h: $image.outerHeight(true)
+          w: $image.outerWidth(false),
+          h: $image.outerHeight(false)
         };
 
         $selection.css({
